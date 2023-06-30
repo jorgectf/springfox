@@ -2,7 +2,7 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ 'master', 'gh-pages' ]
+    branches: [ 'master' ]
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ 'master' ]
@@ -28,9 +28,17 @@ jobs:
         # Use only 'javascript' to analyze code written in JavaScript, TypeScript or both
         # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
 
+    env:
+      JVM_OPTIONS: -Xmx2G -XX:ReservedCodeCacheSize=1G
+      GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xms256m -Xmx3072m -XX:+HeapDumpOnOutOfMemoryError"'
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+
+    - if: matrix.language == 'java'
+      name: Download Java dependencies
+      run: ./gradlew dependencies npmCi
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
